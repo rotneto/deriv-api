@@ -143,9 +143,18 @@ export default class DerivAPIBasic extends DerivAPICalls {
 
         this.connected
             .then(() => {
-                if (this.isConnectionClosed()) return;
+                /*if (this.isConnectionClosed()) return;
 
-                this.connection.send(JSON.stringify(request));
+                this.connection.send(JSON.stringify(request));*/
+                if (this.connection.readyState === WebSocket.OPEN) {
+                    this.connection.send(JSON.stringify(request));
+                } else {
+                    console.warn('WebSocket is not ready to send messages, still connecting.');
+                    // Aguardar até que a conexão esteja aberta
+                    this.onOpen().subscribe(() => {
+                        this.connection.send(JSON.stringify(request));
+                    });
+                }
             })
             .catch((e) => pending.error(e));
 
@@ -311,9 +320,12 @@ export default class DerivAPIBasic extends DerivAPICalls {
                 clearInterval(this.keep_alive_interval);
                 this.keep_alive_interval = false;
             }
+
             this.pong(); // clear all previous timeout
-            this.connect();
-            this.connectionHandlers();
+            if(this.isConnectionClosed()){
+                this.connect();
+                this.connectionHandlers();
+            }
         }
     }
 
