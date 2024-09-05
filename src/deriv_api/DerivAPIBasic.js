@@ -146,7 +146,7 @@ export default class DerivAPIBasic extends DerivAPICalls {
                 /*if (this.isConnectionClosed()) return;
 
                 this.connection.send(JSON.stringify(request));*/
-                if (this.connection.readyState === WebSocket.OPEN) {
+                if (this.connection.readyState == 1) {
                     this.connection.send(JSON.stringify(request));
                 } else {
                     console.warn('WebSocket is not ready to send messages, still connecting.');
